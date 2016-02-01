@@ -3,6 +3,12 @@
 # The router interface facing the wireless network
 IFACE=em0
 
+# The lock file
+LOCKFILE=/var/run/publish-arp.lock
+
+# Delay between iterations (seconds)
+SLEEPTIME=5
+
 # The wireless access point sometimes refuses to forward broadcast packets
 # between two wireless stations, but never seems to refuse to forward
 # broadcast packets from a wireless station to the wired network.  This
@@ -25,11 +31,29 @@ IFACE=em0
 #
 # We extract their IP and MAC addresses, format them into a table for arp -f
 # that marks each entry "published", and pass them via arp's stdin.
+#
+# All of this runs in a $SLEEPTIME-second loop, since we need to keep the
+# published flags reasonably up-to-date so clients will start working soon
+# after they associate.  The loop runs in a child process, under a lock, so
+# this script can be launched periodically from cron and exactly one instance
+# will remain running in the background.
+#
+# Add to cron with e.g.
+# */5 * * * * /root/publish-arp/publish-arp.sh ||:
+# The ||: should prevent lock conflicts from sending annoying failure emails
+# into the ether.
 
-arp -an -i $IFACE | \
-	grep -E '([0-9a-f]{2}:){5}[0-9a-f]{2}' | \
-	awk '/expires/ && !/published/ {
-		gsub(/\(|\)/, "", $2);
-		print $2, $4, "temp", "pub"
-	}' | \
-	arp -f /dev/stdin
+if [ "$1" = "loop" ] ; then
+	while true ; do
+		arp -an -i $IFACE | \
+			grep -E '([0-9a-f]{2}:){5}[0-9a-f]{2}' | \
+			awk '/expires/ && !/published/ {
+				gsub(/\(|\)/, "", $2);
+				print $2, $4, "temp", "pub"
+			}' | \
+			arp -f /dev/stdin
+		sleep $SLEEPTIME
+	done
+else
+	exec lockf -k -s -t 0 "$LOCKFILE" "$0" loop
+fi
