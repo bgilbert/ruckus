@@ -42,6 +42,17 @@ SLEEPTIME=5
 # */5 * * * * /root/publish-arp/publish-arp.sh ||:
 # The ||: should prevent lock conflicts from sending annoying failure emails
 # into the ether.
+#
+# TODO:
+# - Add README.txt and CONTRIBUTING.txt
+# - Convert README.txt and CONTRIBUTING.txt to Markdown
+# - Unit testing
+# - Add web server and REST API
+# - Move lock file to Oracle database
+# - Tweet when publishing an ARP table entry
+# - Add Like button
+# - First-round funding
+# - Get a better access point
 
 if [ "$1" = "loop" ] ; then
 	while true ; do
