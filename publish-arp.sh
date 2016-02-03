@@ -26,8 +26,12 @@ SLEEPTIME=5
 # We first find ARP table entries on $IFACE, which
 # - have a valid MAC address (i.e., are not pending ARP requests),
 # - are temporary rather than permanent entries [via the check for "expires"],
-# - are not expired, and
-# - are not already published.
+# - are not expired,
+# - are not already published, and
+# - are not the access point (10.0.0.6).
+#
+# (The access point seems to go into a boot loop if its ARP table entry is
+# published.)
 #
 # We extract their IP and MAC addresses, format them into a table for arp -f
 # that marks each entry "published", and pass them via arp's stdin.
@@ -58,7 +62,7 @@ if [ "$1" = "loop" ] ; then
 	while true ; do
 		arp -an -i $IFACE | \
 			grep -E '([0-9a-f]{2}:){5}[0-9a-f]{2}' | \
-			awk '/expires/ && !/published/ {
+			awk '/expires/ && !/published/ && !/10\.0\.0\.6/ {
 				gsub(/\(|\)/, "", $2);
 				print $2, $4, "temp", "pub"
 			}' | \
