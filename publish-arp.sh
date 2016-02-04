@@ -43,7 +43,11 @@ SLEEPTIME=5
 # will remain running in the background.
 #
 # Add to cron with e.g.
-# */5 * * * * /root/ruckus/publish-arp.sh ||:
+#
+#     PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+#
+#     */5 * * * * /root/ruckus/publish-arp.sh ||:
+#
 # The ||: should prevent lock conflicts from sending annoying failure emails
 # into the ether.
 #
