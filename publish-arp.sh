@@ -44,6 +44,7 @@ SLEEPTIME=5
 #
 # Add to cron with e.g.
 #
+#     # $PATH is not set when publish-arp.sh is run by cron
 #     PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 #
 #     */5 * * * * /root/ruckus/publish-arp.sh ||:
@@ -74,5 +75,8 @@ if [ "$1" = "loop" ] ; then
 		sleep $SLEEPTIME
 	done
 else
+	# -k - don't delete $LOCKFILE when we quit
+	# -s - silent
+	# -t - timeout of zero seconds
 	exec lockf -k -s -t 0 "$LOCKFILE" "$0" loop
 fi
