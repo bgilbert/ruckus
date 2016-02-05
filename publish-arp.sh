@@ -44,7 +44,7 @@ SLEEPTIME=5
 #
 # Add to cron with e.g.
 #
-#     # $PATH is not set when publish-arp.sh is run by cron
+#     # $PATH doesn't include */sbin when publish-arp.sh is run by cron
 #     PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 #
 #     */5 * * * * /root/ruckus/publish-arp.sh ||:
